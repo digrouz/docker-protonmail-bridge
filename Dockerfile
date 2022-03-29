@@ -7,7 +7,7 @@ ARG BRIDGE_VERSION='2.1.1'
 ENV LANG='en_US.UTF-8' \
     LANGUAGE='en_US.UTF-8' \
     TERM='xterm' \
-    APPUSER='proton' \
+    APPUSER='bridge' \
     APPUID='10039' \
     APPGID='10039' \
     BRIDGE_VERSION="${BRIDGE_VERSION}"
@@ -26,12 +26,21 @@ RUN set -x && \
     apk upgrade --no-cache && \
     apk add --no-cache --virtual=build-deps \
       curl \
+      git \
+      go \
+      make \
+      unzip \
     && \
     apk add --no-cache --virtual=run-deps \
       bash \
       ca-certificates \
       su-exec \
     && \
+    curl -SsL https://github.com/ProtonMail/proton-bridge/archive/refs/tags/v${BRIDGE_VERSION}.zip -o /tmp/bridge.zip && \
+    unzip /tmp/bridge.zip -d /tmp && \
+    mv /tmp/proton-bridge-${BRIDGE_VERSION} /tmp/proton-bridge && \
+    cd /tmp/proton-bridge && \
+    make build-nogui && \
     apk del --no-cache --purge \
       build-deps  \
     && \
@@ -50,8 +59,8 @@ Expose 25/tcp
 Expose 143/tcp
 
 ### Running User: not used, managed by docker-entrypoint.sh
-#USER proton
+#USER bridge
 
-### Start proton
+### Start bridge
 ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["proton"]
+CMD ["bridge"]
