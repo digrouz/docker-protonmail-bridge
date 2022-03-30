@@ -35,6 +35,7 @@ RUN set -x && \
     apk add --no-cache --virtual=run-deps \
       bash \
       ca-certificates \
+      socat \
       su-exec \
     && \
     cd /tmp && \
