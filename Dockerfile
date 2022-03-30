@@ -28,17 +28,17 @@ RUN set -x && \
       curl \
       git \
       go \
+      libsecret-dev \
       make \
-      unzip \
+      pkgconfig \
     && \
     apk add --no-cache --virtual=run-deps \
       bash \
       ca-certificates \
       su-exec \
     && \
-    curl -SsL https://github.com/ProtonMail/proton-bridge/archive/refs/tags/v${BRIDGE_VERSION}.zip -o /tmp/bridge.zip && \
-    unzip /tmp/bridge.zip -d /tmp && \
-    mv /tmp/proton-bridge-${BRIDGE_VERSION} /tmp/proton-bridge && \
+    cd /tmp && \
+    git clone --depth 1 --branch v${BRIDGE_VERSION} https://github.com/ProtonMail/proton-bridge.git /tmp/proton-bridge && \
     cd /tmp/proton-bridge && \
     make build-nogui && \
     apk del --no-cache --purge \
