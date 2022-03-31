@@ -25,6 +25,8 @@ RUN set -x && \
     ConfigureUser && \
     apk upgrade --no-cache && \
     apk add --no-cache --virtual=build-deps \
+      bash \
+      ca-certificates \
       curl \
       git \
       go \
