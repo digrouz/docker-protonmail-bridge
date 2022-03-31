@@ -55,7 +55,7 @@ RUN set -x && \
            /var/tmp/*
     
 ### Volume
-Volume ["/config"]
+#Volume ["/config"]
 
 ### Expose ports
 Expose 25/tcp
