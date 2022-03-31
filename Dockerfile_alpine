@@ -1,11 +1,28 @@
-ARG BRIDGE_VERSION='2.1.2'
-
-FROM alpine:3.15.3 as builder
+FROM alpine:3.15.3
 LABEL maintainer "DI GREGORIO Nicolas <nicolas.digregorio@gmail.com>"
 
-ARG BRIDGE_VERSION
+ARG BRIDGE_VERSION='2.1.2'
 
+### Environment variables
+ENV LANG='en_US.UTF-8' \
+    LANGUAGE='en_US.UTF-8' \
+    TERM='xterm' \
+    APPUSER='bridge' \
+    APPUID='10039' \
+    APPGID='10039' \
+    BRIDGE_VERSION="${BRIDGE_VERSION}"
+
+### Copy files
+COPY root/ /
+
+### Install Application
 RUN set -x && \
+    chmod 1777 /tmp && \
+    . /usr/local/bin/docker-entrypoint-functions.sh && \
+    MYUSER="${APPUSER}" && \
+    MYUID="${APPUID}" && \
+    MYGID="${APPGID}" && \
+    ConfigureUser && \
     apk upgrade --no-cache && \
     apk add --no-cache --virtual=build-deps \
       bash \
@@ -20,35 +37,9 @@ RUN set -x && \
     cd /tmp && \
     git clone --depth 1 --branch v${BRIDGE_VERSION} https://github.com/ProtonMail/proton-bridge.git /tmp/proton-bridge && \
     cd /tmp/proton-bridge && \
-    make build-nogui
-
-FROM alpine:3.15.3
-LABEL maintainer "DI GREGORIO Nicolas <nicolas.digregorio@gmail.com>"
-
-ARG BRIDGE_VERSION
-
-### Environment variables
-ENV LANG='en_US.UTF-8' \
-    LANGUAGE='en_US.UTF-8' \
-    TERM='xterm' \
-    APPUSER='bridge' \
-    APPUID='10039' \
-    APPGID='10039' \
-    BRIDGE_VERSION="${BRIDGE_VERSION}"
-
-### Copy files
-COPY root/ /
-COPY --from=builder /tmp/proton-bridge/proton-bridge /opt/proton-bridge
-
-### Install Application
-RUN set -x && \
-    chmod 1777 /tmp && \
-    . /usr/local/bin/docker-entrypoint-functions.sh && \
-    MYUSER="${APPUSER}" && \
-    MYUID="${APPUID}" && \
-    MYGID="${APPGID}" && \
-    ConfigureUser && \
-    apk upgrade --no-cache && \
+    make build-nogui && \
+    mkdir -p /opt/protonmail/bin/ && \
+    cp /tmp/proton-bridge/proton-bridge /opt/protonmail/bin/ && \
     apk add --no-cache --virtual=run-deps \
       bash \
       ca-certificates \
@@ -57,6 +48,7 @@ RUN set -x && \
       socat \
       su-exec \
     && \
+    apk del --no-cache build-deps && \
     mkdir /docker-entrypoint.d && \
     chmod +x /usr/local/bin/docker-entrypoint.sh && \
     ln -snf /usr/local/bin/docker-entrypoint.sh /docker-entrypoint.sh && \
@@ -65,7 +57,7 @@ RUN set -x && \
            /var/tmp/*
     
 ### Volume
-#Volume ["/config"]
+#Volume ["/volume1"]
 
 ### Expose ports
 Expose 25/tcp
