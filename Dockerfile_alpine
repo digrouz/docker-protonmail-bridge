@@ -23,6 +23,8 @@ RUN set -x && \
     MYUID="${APPUID}" && \
     MYGID="${APPGID}" && \
     ConfigureUser && \
+    chown ${APPUSER} /home/${APPUSER} && \
+    chmod 700 /home/${APPUSER} && \
     apk upgrade --no-cache && \
     apk add --no-cache --virtual=build-deps \
       bash \
@@ -40,9 +42,6 @@ RUN set -x && \
     make build-nogui && \
     mkdir -p /opt/protonmail/bin/ && \
     cp /tmp/proton-bridge/proton-bridge /opt/protonmail/bin/ && \
-    mkdir /home/${APPUSER} && \
-    chown ${APPUSER} /home/${APPUSER} && \
-    chmod 700 /home/${APPUSER} && \
     apk add --no-cache --virtual=run-deps \
       bash \
       ca-certificates \
