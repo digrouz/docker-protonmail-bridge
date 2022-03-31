@@ -1,7 +1,7 @@
 FROM alpine:3.15.3
 LABEL maintainer "DI GREGORIO Nicolas <nicolas.digregorio@gmail.com>"
 
-ARG BRIDGE_VERSION='2.1.1'
+ARG BRIDGE_VERSION='2.1.2'
 
 ### Environment variables
 ENV LANG='en_US.UTF-8' \
@@ -32,16 +32,16 @@ RUN set -x && \
       make \
       pkgconfig \
     && \
+    cd /tmp && \
+    git clone --depth 1 --branch v${BRIDGE_VERSION} https://github.com/ProtonMail/proton-bridge.git /tmp/proton-bridge && \
+    cd /tmp/proton-bridge && \
+    make build-nogui && \
     apk add --no-cache --virtual=run-deps \
       bash \
       ca-certificates \
       socat \
       su-exec \
     && \
-    cd /tmp && \
-    git clone --depth 1 --branch v${BRIDGE_VERSION} https://github.com/ProtonMail/proton-bridge.git /tmp/proton-bridge && \
-    cd /tmp/proton-bridge && \
-    make build-nogui && \
     apk del --no-cache --purge \
       build-deps  \
     && \
