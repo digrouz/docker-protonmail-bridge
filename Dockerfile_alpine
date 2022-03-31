@@ -20,7 +20,7 @@ RUN set -x && \
     cd /tmp && \
     git clone --depth 1 --branch v${BRIDGE_VERSION} https://github.com/ProtonMail/proton-bridge.git /tmp/proton-bridge && \
     cd /tmp/proton-bridge && \
-    make build-nogui && \
+    make build-nogui
 
 FROM alpine:3.15.3
 LABEL maintainer "DI GREGORIO Nicolas <nicolas.digregorio@gmail.com>"
