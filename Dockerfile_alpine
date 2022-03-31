@@ -1,28 +1,11 @@
-FROM alpine:3.15.3
-LABEL maintainer "DI GREGORIO Nicolas <nicolas.digregorio@gmail.com>"
-
 ARG BRIDGE_VERSION='2.1.2'
 
-### Environment variables
-ENV LANG='en_US.UTF-8' \
-    LANGUAGE='en_US.UTF-8' \
-    TERM='xterm' \
-    APPUSER='bridge' \
-    APPUID='10039' \
-    APPGID='10039' \
-    BRIDGE_VERSION="${BRIDGE_VERSION}"
-    
-### Copy config files
-COPY root/ /
+FROM alpine:3.15.3 as builder
+LABEL maintainer "DI GREGORIO Nicolas <nicolas.digregorio@gmail.com>"
 
-### Install Application
+ARG BRIDGE_VERSION
+
 RUN set -x && \
-    chmod 1777 /tmp && \
-    . /usr/local/bin/docker-entrypoint-functions.sh && \
-    MYUSER="${APPUSER}" && \
-    MYUID="${APPUID}" && \
-    MYGID="${APPGID}" && \
-    ConfigureUser && \
     apk upgrade --no-cache && \
     apk add --no-cache --virtual=build-deps \
       bash \
@@ -38,14 +21,41 @@ RUN set -x && \
     git clone --depth 1 --branch v${BRIDGE_VERSION} https://github.com/ProtonMail/proton-bridge.git /tmp/proton-bridge && \
     cd /tmp/proton-bridge && \
     make build-nogui && \
+
+FROM alpine:3.15.3 as builder
+LABEL maintainer "DI GREGORIO Nicolas <nicolas.digregorio@gmail.com>"
+
+ARG BRIDGE_VERSION
+
+### Environment variables
+ENV LANG='en_US.UTF-8' \
+    LANGUAGE='en_US.UTF-8' \
+    TERM='xterm' \
+    APPUSER='bridge' \
+    APPUID='10039' \
+    APPGID='10039' \
+    BRIDGE_VERSION="${BRIDGE_VERSION}"
+
+### Copy files
+COPY root/ /
+COPY --from=builder /tmp/proton-bridge/proton-bridge /opt/proton-bridge
+
+### Install Application
+RUN set -x && \
+    chmod 1777 /tmp && \
+    . /usr/local/bin/docker-entrypoint-functions.sh && \
+    MYUSER="${APPUSER}" && \
+    MYUID="${APPUID}" && \
+    MYGID="${APPGID}" && \
+    ConfigureUser && \
+    apk upgrade --no-cache && \
     apk add --no-cache --virtual=run-deps \
       bash \
       ca-certificates \
+      libsecret \
+      pass \
       socat \
       su-exec \
-    && \
-    apk del --no-cache --purge \
-      build-deps  \
     && \
     mkdir /docker-entrypoint.d && \
     chmod +x /usr/local/bin/docker-entrypoint.sh && \
