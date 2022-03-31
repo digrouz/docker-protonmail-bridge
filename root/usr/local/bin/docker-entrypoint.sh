@@ -10,9 +10,12 @@ MYGID="${APPGID}"
 AutoUpgrade
 
 if [ "$1" == 'bridge-init' ]; then
-    su-exec ${MYUSER} gpg --generate-key --batch /opt/protonmail/etc/gpg-parameters
-    su-exec ${MYUSER} pass init proton-key
-    su-exec ${MYUSER} /opt/protonmail/bin/proton-bridge --cli $@
+  DockLog "Generate gpg key"
+  su-exec ${MYUSER} gpg --generate-key --batch /opt/protonmail/etc/gpg-parameters
+  DockLog "Init password manager"
+  su-exec ${MYUSER} pass init proton-key
+  DockLog "Init Bridge"
+  su-exec ${MYUSER} /opt/protonmail/bin/proton-bridge --cli $@
 elif [ "$1" == 'bridge' ]; then
   RunDropletEntrypoint
   DockLog "Bind smtp port 25"
