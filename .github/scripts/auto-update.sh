@@ -3,13 +3,7 @@
 BRIDGE_URL="https://api.github.com/repos/ProtonMail/proton-bridge/tags"
 
 FULL_LAST_VERSION=$(curl -SsL ${BRIDGE_URL} | \
-              jq -r -c '.[] | \
-                        select( .name | \
-                                (contains("rc") | not) and \
-                                (contains("beta") | not) and \
-                                (contains("alpha") | not) \
-                              ) | \
-                        .name' |\
+              jq -r -c '.[] | select( .name | (contains("rc") | not) and (contains("beta") | not) and (contains("alpha") | not)) | .name' |\
               head -1 \
               )
 LAST_VERSION="${FULL_LAST_VERSION:1}"
