@@ -55,7 +55,7 @@ RUN set -x && \
     mkdir /docker-entrypoint.d && \
     chmod +x /usr/local/bin/docker-entrypoint.sh && \
     ln -snf /usr/local/bin/docker-entrypoint.sh /docker-entrypoint.sh && \
-    rm -rf /tmp/* \
+    rm -rf /root/{.cache,go} \
            /var/cache/apk/*  \
            /var/tmp/*
     
