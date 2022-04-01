@@ -55,9 +55,11 @@ RUN set -x && \
     mkdir /docker-entrypoint.d && \
     chmod +x /usr/local/bin/docker-entrypoint.sh && \
     ln -snf /usr/local/bin/docker-entrypoint.sh /docker-entrypoint.sh && \
-    rm -rf /root/{.cache,go} \
+    rm -rf /root/.cache \
+           /root/go \
+           /tmp/* \
            /var/cache/apk/*  \
-           /var/tmp/*
+           /var/tmp/* 
     
 ### Volume
 #Volume ["/volume1"]
