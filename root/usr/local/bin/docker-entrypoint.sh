@@ -16,7 +16,7 @@ if [ "$1" == 'bridge-init' ]; then
   DockLog "Init password manager"
   su-exec ${MYUSER} pass init proton-key
   DockLog "Init Bridge"
-  su-exec ${MYUSER} /opt/protonmail/bin/proton-bridge --cli $@
+  exec su-exec ${MYUSER} /opt/protonmail/bin/proton-bridge --cli $@
 elif [ "$1" == 'bridge' ]; then
   RunDropletEntrypoint
   DockLog "Bind smtp port 25"
@@ -24,7 +24,7 @@ elif [ "$1" == 'bridge' ]; then
   DockLog "Bind imap port 143"
   socat TCP-LISTEN:143,fork TCP:127.0.0.1:1143 &
   DockLog "Starting app: ${1}"
-  su-exec ${MYUSER} /opt/protonmail/bin/proton-bridge --cli $@
+  exec su-exec ${MYUSER} /opt/protonmail/bin/proton-bridge --cli $@
 else
   DockLog "Starting app: ${@}"
   exec "$@"
