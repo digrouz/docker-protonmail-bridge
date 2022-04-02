@@ -8,6 +8,7 @@ MYUID="${APPUID}"
 MYGID="${APPGID}"
 
 AutoUpgrade
+ConfigureUser
 
 if [ "$1" == 'bridge-init' ]; then
   DockLog "Generate gpg key"
