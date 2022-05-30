@@ -45,8 +45,6 @@ RUN set -x && \
     apk add --no-cache --virtual=run-deps \
       bash \
       ca-certificates \
-      dbus-x11 \
-      gnome-keyring \
       gpg-agent \
       libsecret \
       pass \
