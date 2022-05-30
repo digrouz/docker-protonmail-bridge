@@ -36,7 +36,7 @@ elif [ "$1" == 'bridge' ]; then
   chown ${MYUSER} /opt/protonmail/etc/protontty
   
   DockLog "Starting app: ${1}"
-  exec cat /opt/protonmail/etc/protontty | su-exec ${MYUSER} /opt/protonmail/bin/proton-bridge --non-interactive
+  exec cat /opt/protonmail/etc/protontty | su-exec ${MYUSER} /opt/protonmail/bin/proton-bridge --noninteractive
 else
   DockLog "Starting app: ${@}"
   exec "$@"
