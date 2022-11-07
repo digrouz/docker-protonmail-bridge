@@ -3,7 +3,7 @@
 BRIDGE_URL="https://api.github.com/repos/ProtonMail/proton-bridge/releases"
 
 FULL_LAST_VERSION=$(curl -SsL ${BRIDGE_URL} | \
-              jq -r -c '.[] | select( .prerelease == true ) | .tag_name' |\
+              jq -r -c '.[] | select( .prerelease == false ) | .tag_name' |\
               head -1 \
               )
 LAST_VERSION="${FULL_LAST_VERSION:1}"
