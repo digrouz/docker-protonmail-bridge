@@ -1,4 +1,4 @@
-FROM alpine:3.17.3
+FROM alpine:
 LABEL maintainer "DI GREGORIO Nicolas <nicolas.digregorio@gmail.com>"
 
 ARG BRIDGE_VERSION='3.1.2'
