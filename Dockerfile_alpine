@@ -1,7 +1,7 @@
 FROM alpine:3.18.4
 LABEL maintainer "DI GREGORIO Nicolas <nicolas.digregorio@gmail.com>"
 
-ARG BRIDGE_VERSION='3.5.1'
+ARG BRIDGE_VERSION='3.5.3'
 
 ### Environment variables
 ENV LANG='en_US.UTF-8' \
