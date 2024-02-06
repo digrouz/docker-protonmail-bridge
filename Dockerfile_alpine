@@ -1,4 +1,4 @@
-FROM alpine:3.19.1
+FROM digrouz/alpine-s6:latest
 LABEL maintainer "DI GREGORIO Nicolas <nicolas.digregorio@gmail.com>"
 
 ARG BRIDGE_VERSION='3.8.2'
@@ -6,10 +6,6 @@ ARG BRIDGE_VERSION='3.8.2'
 ### Environment variables
 ENV LANG='en_US.UTF-8' \
     LANGUAGE='en_US.UTF-8' \
-    TERM='xterm' \
-    APPUSER='bridge' \
-    APPUID='10039' \
-    APPGID='10039' \
     BRIDGE_VERSION="${BRIDGE_VERSION}"
 
 ### Copy files
@@ -17,14 +13,6 @@ COPY root/ /
 
 ### Install Application
 RUN set -x && \
-    chmod 1777 /tmp && \
-    . /usr/local/bin/docker-entrypoint-functions.sh && \
-    MYUSER="${APPUSER}" && \
-    MYUID="${APPUID}" && \
-    MYGID="${APPGID}" && \
-    ConfigureUser && \
-    chown ${APPUSER} /home/${APPUSER} && \
-    chmod 700 /home/${APPUSER} && \
     apk upgrade --no-cache && \
     apk add --no-cache --virtual=build-deps \
       bash \
@@ -43,18 +31,14 @@ RUN set -x && \
     mkdir -p /opt/protonmail/bin/ && \
     cp /tmp/proton-bridge/proton-bridge /opt/protonmail/bin/ && \
     apk add --no-cache --virtual=run-deps \
-      bash \
       ca-certificates \
       gpg-agent \
       libsecret \
       pass \
-      socat \
-      su-exec \
+      socat
     && \
     apk del --no-cache build-deps && \
     mkdir /docker-entrypoint.d && \
-    chmod +x /usr/local/bin/docker-entrypoint.sh && \
-    ln -snf /usr/local/bin/docker-entrypoint.sh /docker-entrypoint.sh && \
     rm -rf /root/.cache \
            /root/go \
            /tmp/* \
@@ -67,10 +51,3 @@ RUN set -x && \
 ### Expose ports
 Expose 25/tcp
 Expose 143/tcp
-
-### Running User: not used, managed by docker-entrypoint.sh
-#USER bridge
-
-### Start bridge
-ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["bridge"]
