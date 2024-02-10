@@ -41,7 +41,6 @@ jobs:
           file: Dockerfile_alpine
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/protonmail-bridge:alpine
-
   dockerHubDescription:
     runs-on: ubuntu-latest
     steps:
@@ -53,4 +52,3 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
         repository: ${{ secrets.DOCKERHUB_USERNAME }}/protonmail-bridge
-        short-description: ${{ github.event.repository.description }}
