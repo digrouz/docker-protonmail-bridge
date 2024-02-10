@@ -48,7 +48,7 @@ jobs:
     - uses: actions/checkout@main
 
     - name: Docker Hub Description
-      uses: peter-evans/dockerhub-description@v4
+      uses: peter-evans/dockerhub-description@main
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}

@@ -4,7 +4,8 @@ LABEL maintainer "DI GREGORIO Nicolas <nicolas.digregorio@gmail.com>"
 ARG BRIDGE_VERSION='3.8.2'
 
 ### Environment variables
-ENV BRIDGE_VERSION="${BRIDGE_VERSION}"
+ENV BRIDGE_VERSION="${BRIDGE_VERSION}" \
+    CGO_CFLAGS="-D_LARGEFILE64_SOURCE"
 
 ### Copy files
 COPY root/ /
