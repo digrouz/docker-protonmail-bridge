@@ -35,6 +35,7 @@ RUN set -x && \
       libsecret \
       pass \
       socat \
+      su-exec \
     && \
     apk del --no-cache build-deps && \
     mkdir /docker-entrypoint.d && \
