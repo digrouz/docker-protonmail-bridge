@@ -41,13 +41,14 @@ jobs:
           file: Dockerfile_alpine
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/protonmail-bridge:alpine
+
   dockerHubDescription:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@main
 
     - name: Docker Hub Description
-      uses: peter-evans/dockerhub-description@main
+      uses: peter-evans/dockerhub-description@v4
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
