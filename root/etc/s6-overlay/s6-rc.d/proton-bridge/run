@@ -1,0 +1,3 @@
+#!/command/with-contenv sh
+
+exec cat /opt/protonmail/etc/protontty | s6-setuidgid appuser /opt/protonmail/bin/proton-bridge --noninteractive

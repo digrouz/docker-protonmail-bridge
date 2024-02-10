@@ -1,0 +1,11 @@
+#!/command/with-contenv sh
+
+if [ -e /opt/protonmail/etc/protontty ];then
+  echo "Cleanup TTY /opt/protonmail/etc/protontty"
+  rm -rf /opt/protonmail/etc/protontty
+fi
+
+echo "Creating TTY /opt/protonmail/etc/protontty"
+mkfifo /opt/protonmail/etc/protontty
+chown appuser /opt/protonmail/etc/protontty
+  

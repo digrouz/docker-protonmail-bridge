@@ -4,9 +4,7 @@ LABEL maintainer "DI GREGORIO Nicolas <nicolas.digregorio@gmail.com>"
 ARG BRIDGE_VERSION='3.8.2'
 
 ### Environment variables
-ENV LANG='en_US.UTF-8' \
-    LANGUAGE='en_US.UTF-8' \
-    BRIDGE_VERSION="${BRIDGE_VERSION}"
+ENV BRIDGE_VERSION="${BRIDGE_VERSION}"
 
 ### Copy files
 COPY root/ /
@@ -35,7 +33,7 @@ RUN set -x && \
       gpg-agent \
       libsecret \
       pass \
-      socat
+      socat \
     && \
     apk del --no-cache build-deps && \
     mkdir /docker-entrypoint.d && \

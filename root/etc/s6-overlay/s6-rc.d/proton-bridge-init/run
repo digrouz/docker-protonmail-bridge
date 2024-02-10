@@ -1,0 +1,9 @@
+#!/command/with-contenv sh
+
+echo "Generate gpg key"
+s6-setuidgid appuser gpg --generate-key --batch /opt/protonmail/etc/gpg-parameters
+echo "Init password manager"
+s6-setuidgid appuser pass init proton-key
+  
+echo "Init Bridge"
+exec s6-setuidgid appuser /opt/protonmail/bin/proton-bridge --cli init
