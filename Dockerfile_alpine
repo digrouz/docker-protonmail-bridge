@@ -1,7 +1,7 @@
 FROM digrouz/alpine-s6:latest
 LABEL maintainer "DI GREGORIO Nicolas <nicolas.digregorio@gmail.com>"
 
-ARG BRIDGE_VERSION='3.8.2'
+ARG BRIDGE_VERSION='3.9.1'
 
 ### Environment variables
 ENV BRIDGE_VERSION="${BRIDGE_VERSION}" \
