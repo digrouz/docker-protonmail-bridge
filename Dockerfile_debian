@@ -54,7 +54,8 @@ LABEL maintainer "DI GREGORIO Nicolas <nicolas.digregorio@gmail.com>"
 ARG BRIDGE_VERSION
 
 ### Environment variables
-ENV BRIDGE_VERSION="${BRIDGE_VERSION}" 
+ENV BRIDGE_VERSION="${BRIDGE_VERSION}" \
+    XDG_CONFIG_HOME="/opt/protonmail/etc"
 
 ### Copy files
 COPY root/ /
@@ -73,6 +74,7 @@ RUN set -x && \
       socat \
     && \
     chmod 755 /opt/protonmail/bin/proton-bridge && \
+    chown -R appuser:appuser /opt/protonmail && \
     apt-get -y autoclean && \
     apt-get -y clean && \
     apt-get -y autoremove && \
