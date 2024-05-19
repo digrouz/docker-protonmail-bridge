@@ -55,7 +55,7 @@ ARG BRIDGE_VERSION
 
 ### Environment variables
 ENV BRIDGE_VERSION="${BRIDGE_VERSION}" \
-    XDG_CONFIG_HOME="/opt/protonmail/etc"
+    XDG_CONFIG_HOME="/home/appuser"
 
 ### Copy files
 COPY root/ /
