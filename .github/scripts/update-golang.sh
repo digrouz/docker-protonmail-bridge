@@ -3,7 +3,7 @@
 GOLANG_URL="https://api.github.com/repos/golang/go/tags\?page\=4"
 
 FULL_LAST_VERSION=$(curl -SsL ${GOLANG_URL} | \
-              jq -r -c '.[]  select( .name | contains("go") and (contains("rc") | not) )| .name' |\
+              jq -r -c '.[] | select( .name | contains("go") and (contains("rc") | not ) )| .name' |\
               sort \
               tail -1 \
               )
