@@ -7,7 +7,7 @@ FULL_LAST_VERSION=$(curl -SsL -H "Accept: application/vnd.github.v3+json" ${GOLA
               sort |\
               tail -1 \
               )
-LAST_VERSION="${FULL_LAST_VERSION:3}"
+LAST_VERSION="${FULL_LAST_VERSION:2}"
 
 sed -i -e "s|GOLANG_VERSION='.*'|GOLANG_VERSION='${LAST_VERSION}'|" Dockerfile*
 
