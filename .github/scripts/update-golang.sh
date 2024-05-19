@@ -4,7 +4,7 @@ GOLANG_URL="https://api.github.com/repos/golang/go/tags\?page\=4"
 
 FULL_LAST_VERSION=$(curl -SsL ${GOLANG_URL} | \
               jq -r -c '.[] | select( .name | contains("go") and (contains("rc") | not ) )| .name' |\
-              sort \
+              sort |\
               tail -1 \
               )
 LAST_VERSION="${FULL_LAST_VERSION:3}"
