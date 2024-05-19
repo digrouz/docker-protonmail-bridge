@@ -55,8 +55,9 @@ LABEL maintainer "DI GREGORIO Nicolas <nicolas.digregorio@gmail.com>"
 ARG BRIDGE_VERSION
 
 ### Environment variables
-ENV BRIDGE_VERSION="${BRIDGE_VERSION}" \
-    XDG_CONFIG_HOME="/home/appuser"
+ENV S6_CMD_WAIT_FOR_SERVICES_MAXTIME=0 \
+    BRIDGE_VERSION="${BRIDGE_VERSION}" \
+    XDG_CONFIG_HOME="/home/appuser" 
 
 ### Copy files
 COPY root/ /
