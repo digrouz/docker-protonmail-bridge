@@ -25,7 +25,8 @@ RUN set -x && \
     git clone --depth 1 --branch v${BRIDGE_VERSION} https://github.com/ProtonMail/proton-bridge.git /tmp/proton-bridge && \
     cd /tmp/proton-bridge && \
     PATH=/opt/go/bin:$PATH && \
-    make build-nogui    
+    make build-nogui && \
+    ls -l1
 
 FROM digrouz/debian-s6:latest as su-exec-builder
 
@@ -59,7 +60,7 @@ ENV BRIDGE_VERSION="${BRIDGE_VERSION}" \
 
 ### Copy files
 COPY root/ /
-COPY --from=builder /tmp/proton-bridge/proton-bridge /opt/protonmail/bin/
+COPY --from=builder /tmp/proton-bridge/bridge /opt/protonmail/bin/proton-bridge
 COPY --from=su-exec-builder /tmp/su-exec/su-exec /usr/local/bin/
 
 ### Install Application
