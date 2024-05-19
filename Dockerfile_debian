@@ -1,0 +1,66 @@
+FROM digrouz/debian-s6:latest as builder
+
+ARG BRIDGE_VERSION='3.8.2'
+ARG GOLANG_VERSION=''
+ARG GOLANG_ARCH='amd64'
+
+### Environment variables
+ENV BRIDGE_VERSION="${BRIDGE_VERSION}" \
+    GOLANG_VERSION="${GOLANG_VERSION}" \
+    GOLANG_ARCH="${GOLANG_ARCH}" 
+
+RUN set -x && \
+    apt-get update && \
+    apt-get -y --no-install-recommends dist-upgrade && \
+    apt-get install -y --no-install-recommends\
+      build-essential \
+      ca-certificates \
+      curl \
+      git \
+      libsecret-1-dev \
+    && \
+    cd /tmp && \
+    curl -SsL https://go.dev/dl/go${GOLANG_VERSION}.linux-${GOLANG_ARCH}.tar.gz -o /tmp/golang.tar.gz && \
+    tar xzf /tmp/golang.tar.gz -C /opt && \
+    git clone --depth 1 --branch v${BRIDGE_VERSION} https://github.com/ProtonMail/proton-bridge.git /tmp/proton-bridge && \
+    cd /tmp/proton-bridge && \
+    PATH=/opt/go/bin:$PATH && \
+    make build-nogui    
+
+FROM digrouz/debian-s6:latest
+LABEL maintainer "DI GREGORIO Nicolas <nicolas.digregorio@gmail.com>"
+
+ARG BRIDGE_VERSION
+
+### Environment variables
+ENV BRIDGE_VERSION="${BRIDGE_VERSION}" 
+
+### Copy files
+COPY root/ /
+COPY --from=builder /tmp/proton-bridge/proton-bridge /opt/protonmail/bin/
+
+### Install Application
+RUN set -x && \
+    apt-get update && \
+    apt-get -y --no-install-recommends dist-upgrade && \
+    apt-get install -y --no-install-recommends \
+      ca-certificates \
+      gpg-agent \
+      libsecret-1.0 \
+      pass \
+      socat \
+    && \
+    chmod 755 /opt/protonmail/bin/proton-bridge && \
+    apt-get -y autoclean && \
+    apt-get -y clean && \
+    apt-get -y autoremove && \
+    rm -rf /tmp/* \
+           /var/lib/apt/lists/* \
+           /var/tmp/*
+    
+### Volume
+#Volume ["/volume1"]
+
+### Expose ports
+Expose 25/tcp
+Expose 143/tcp
