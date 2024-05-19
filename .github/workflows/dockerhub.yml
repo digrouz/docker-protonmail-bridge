@@ -3,7 +3,7 @@ name: dockerhub-workflow
 on:
   push:
     branches:
-      - 'main'
+      - 'master'
   workflow_dispatch:
 
 jobs:
@@ -30,7 +30,7 @@ jobs:
         uses: docker/build-push-action@master
         with:
           context: .
-          file: Dockerfile_alpine
+          file: Dockerfile_debian
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/protonmail-bridge:latest
       -
@@ -38,9 +38,9 @@ jobs:
         uses: docker/build-push-action@master
         with:
           context: .
-          file: Dockerfile_alpine
+          file: Dockerfile_debian
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/protonmail-bridge:alpine
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/protonmail-bridge:debian
   dockerHubDescription:
     runs-on: ubuntu-latest
     steps:
@@ -52,3 +52,4 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
         repository: ${{ secrets.DOCKERHUB_USERNAME }}/protonmail-bridge
+        short-description: ${{ github.event.repository.description }}
