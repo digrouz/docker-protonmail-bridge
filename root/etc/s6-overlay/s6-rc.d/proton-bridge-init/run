@@ -1,5 +1,7 @@
 #!/command/with-contenv sh
 
+cd /opt/protonmail
+
 echo "Generate gpg key"
 su-exec appuser gpg --generate-key --batch /opt/protonmail/etc/gpg-parameters
 echo "Init password manager"

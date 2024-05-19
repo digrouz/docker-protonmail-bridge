@@ -1,3 +1,5 @@
 #!/command/with-contenv sh
 
+cd /opt/protonmail
+
 exec cat /opt/protonmail/etc/protontty | su-exec appuser /opt/protonmail/bin/proton-bridge --noninteractive
