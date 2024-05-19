@@ -47,7 +47,6 @@ RUN set -x && \
       ca-certificates \
       curl \
       git \
-      libsecret-1 \
     && \
     cd /tmp && \
     git clone --depth 1 https://github.com/ncopa/su-exec /tmp/su-exec && \
