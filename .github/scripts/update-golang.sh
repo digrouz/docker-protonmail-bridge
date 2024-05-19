@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-GOLANG_URL="https://api.github.com/repos/golang/go/tags\?page\=4"
+GOLANG_URL="https://api.github.com/repos/golang/go/tags?page=4"
 
-FULL_LAST_VERSION=$(curl -SsL ${GOLANG_URL} | \
+FULL_LAST_VERSION=$(curl -SsL -H "Accept: application/vnd.github.v3+json" ${GOLANG_URL} | \
               jq -r -c '.[] | select( .name | contains("go") and (contains("rc") | not ) )| .name' |\
               sort |\
               tail -1 \
