@@ -1,8 +1,12 @@
-FROM digrouz/debian-s6:latest as builder
-
 ARG BRIDGE_VERSION='3.11.0'
 ARG GOLANG_VERSION='1.22.3'
 ARG GOLANG_ARCH='amd64'
+
+FROM digrouz/debian-s6:latest as builder
+
+ARG BRIDGE_VERSION
+ARG GOLANG_VERSION
+ARG GOLANG_ARCH
 
 ### Environment variables
 ENV BRIDGE_VERSION="${BRIDGE_VERSION}" \
