@@ -8,7 +8,9 @@ FULL_LAST_VERSION=$(curl -SsL ${BRIDGE_URL} | \
               )
 LAST_VERSION="${FULL_LAST_VERSION:1}"
 
-sed -i -e "s|BRIDGE_VERSION='.*'|BRIDGE_VERSION='${LAST_VERSION}'|" Dockerfile*
+if [ "${LAST_VERSION}" ]; then
+  sed -i -e "s|BRIDGE_VERSION='.*'|BRIDGE_VERSION='${LAST_VERSION}'|" Dockerfile*
+fi
 
 if output=$(git status --porcelain) && [ -z "$output" ]; then
   # Working directory clean
