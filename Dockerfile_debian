@@ -77,7 +77,7 @@ RUN set -x && \
     apt-get install -y --no-install-recommends \
       ca-certificates \
       gpg-agent \
-      libcbor \
+      libcbor0.10 \
       libfido2-1 \
       libsecret-1.0 \
       pass \
