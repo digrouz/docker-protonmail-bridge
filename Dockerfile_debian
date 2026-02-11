@@ -21,7 +21,7 @@ RUN set -x && \
       ca-certificates \
       curl \
       git \
-      libfido2-1 \
+      libfido2-1-dev \
       libsecret-1-dev \
     && \
     cd /tmp && \
@@ -76,6 +76,7 @@ RUN set -x && \
     apt-get install -y --no-install-recommends \
       ca-certificates \
       gpg-agent \
+      libfido2-1 \
       libsecret-1.0 \
       pass \
       socat \
