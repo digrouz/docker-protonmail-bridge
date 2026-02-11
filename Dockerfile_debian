@@ -2,7 +2,7 @@ ARG BRIDGE_VERSION='3.22.0'
 ARG GOLANG_VERSION='1.26.0'
 ARG GOLANG_ARCH='amd64'
 
-FROM digrouz/debian-s6:latest as builder
+FROM digrouz/debian-s6:latest AS builder
 
 ARG BRIDGE_VERSION
 ARG GOLANG_VERSION
@@ -21,7 +21,7 @@ RUN set -x && \
       ca-certificates \
       curl \
       git \
-      libfide2 \
+      libfido2 \
       libsecret-1-dev \
     && \
     cd /tmp && \
@@ -33,7 +33,7 @@ RUN set -x && \
     make build-nogui && \
     ls -l1
 
-FROM digrouz/debian-s6:latest as su-exec-builder
+FROM digrouz/debian-s6:latest AS su-exec-builder
 
 ARG BRIDGE_VERSION
 
