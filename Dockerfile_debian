@@ -21,7 +21,7 @@ RUN set -x && \
       ca-certificates \
       curl \
       git \
-      libfido2-1-dev \
+      libfido2-dev \
       libsecret-1-dev \
     && \
     cd /tmp && \
