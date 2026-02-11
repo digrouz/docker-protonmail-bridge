@@ -55,7 +55,7 @@ RUN set -x && \
     make     
 
 FROM digrouz/debian-s6:latest
-LABEL maintainer "DI GREGORIO Nicolas <nicolas.digregorio@gmail.com>"
+LABEL maintainer="DI GREGORIO Nicolas <nicolas.digregorio@gmail.com>"
 
 ARG BRIDGE_VERSION
 
