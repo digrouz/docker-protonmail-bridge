@@ -21,6 +21,7 @@ RUN set -x && \
       ca-certificates \
       curl \
       git \
+      libfide2 \
       libsecret-1-dev \
     && \
     cd /tmp && \
