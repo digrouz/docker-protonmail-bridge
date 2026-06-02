@@ -1,0 +1,21 @@
+{{- if .Values.gatewayApi.enabled }}
+{{- range .Values.gatewayApi.tcpRoutes }}
+apiVersion: gateway.networking.k8k.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: {{ include "protonmail-bridge.fullname" $ }}-{{ .name }}
+  labels:
+    {{- include "protonmail-bridge.selectorLabels" $ | nindent 4 }}
+spec:
+  parentRefs:
+    {{- range .parentRefs }}
+    - name: {{ .name }}
+      namespace: {{ .namespace }}
+    {{- end }}
+  targetRef:
+    group: ""
+    kind: Service
+    name: {{ include "protonmail-bridge.fullname" $ }}
+    port: {{ .port }}
+{{- end }}
+{{- end }}

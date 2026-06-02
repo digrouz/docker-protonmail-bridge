@@ -1,0 +1,6 @@
+apiVersion: v2
+name: protonmail-bridge
+description: A Helm chart for ProtonMail Bridge container
+type: application
+version: 0.1.0
+appVersion: "3.24.2"

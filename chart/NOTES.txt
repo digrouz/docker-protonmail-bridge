@@ -1,0 +1,16 @@
+ProtonMail Bridge Helm Chart
+----------------------------
+The ProtonMail Bridge has been deployed.
+
+Service details:
+- IMAP: {{ .Release.Name }}:{{ index .Values.service.ports "imap" }}
+- SMTP: {{ .Release.Name }}:{{ index .Values.service.ports "smtp" }}
+
+To access the service, use the following command:
+kubectl port-forward svc/{{ .Release.Name }} 143:143
+
+{{- if .Values.gatewayApi.enabled }}
+If Gateway API is enabled, ensure your TCPRoute parentRefs match your configured Gateway.
+{{- end }}
+
+For more information, visit the project repository: https://github.com/digrouz/docker-protonmail-bridge

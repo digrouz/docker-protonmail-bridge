@@ -1,0 +1,93 @@
+# Number of replicas for the ProtonMail Bridge deployment
+replicaCount: 1
+
+# Container image configuration
+image:
+  # Repository of the ProtonMail Bridge image
+  repository: digrouz/protonmail-bridge
+  # Image pull policy (Always, IfNotPresent, Never)
+  pullPolicy: IfNotPresent
+  # Image tag (defaults to Chart.AppVersion if not specified)
+  tag: "latest"
+
+# Service configuration for accessing the bridge via IMAP and SMTP
+service:
+  # Type of Kubernetes service (ClusterIP, NodePort, LoadBalancer)
+  type: ClusterIP
+  # Port mappings for the application services
+  ports:
+    imap: 143
+    smtp: 25
+
+# Environment variables as described in the project README.md
+env:
+  # User ID to run the application with
+  uid: 12345
+  # Group ID to run the application with
+  gid: 12345
+  # Whether to enable software auto-upgrade at startup (0 = disabled, 1 = enabled)
+  autoupgrade: "0"
+  # Timezone for the containerized application
+  timezone: "Europe/Brussels"
+
+# Pod-level security context settings
+podSecurityContext:
+  runAsUser: 12345
+  runAsGroup: 12345
+  fsGroup: 12345
+
+# Container-level security context settings (e.g., capabilities, privilege escalation)
+securityContext: {}
+
+# List of image pull secrets for private registries
+imagePullSecrets: []
+
+# Custom labels to be added to the Pod metadata
+podLabels: {}
+
+# Resource management for the container
+resources:
+  # Maximum resources allowed for the container
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  # Minimum resources guaranteed for the container
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# Persistent storage configuration
+persistence:
+  # Whether to enable persistent volume mounting
+  enabled: false
+  # Name of an existing PersistentVolumeClaim to use (if enabled)
+  existingClaim: ""
+  # Size of the requested volume if a new PVC is created
+  size: 1Gi
+  # Path inside the container where the volume is mounted
+  mountPath: /home/appuser/.config/protonmail-bridge # Adjust based on actual app usage
+
+# Kubernetes scheduling constraints
+# Node selector for targeting specific nodes
+nodeSelector: {}
+# Tolerations to allow pods to be scheduled on tainted nodes
+tolerations: []
+# Affinity rules to control pod placement relative to other pods or nodes
+affinity: {}
+
+# Gateway API configuration (Experimental/Advanced)
+gatewayApi:
+  # Whether to enable TCPRoute resources for the Gateway API
+  enabled: false
+  # Configuration for TCP routes to expose IMAP and SMTP ports via a Gateway
+  tcpRoutes:
+    - name: imap
+      port: 143
+      parentRefs:
+        - name: my-gateway
+          namespace: default
+    - name: smtp
+      port: 25
+      parentRefs:
+        - name: my-gateway
+          namespace: default
