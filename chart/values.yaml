@@ -30,12 +30,6 @@ env:
   # Timezone for the containerized application
   timezone: "Europe/Brussels"
 
-# Pod-level security context settings
-podSecurityContext:
-  runAsUser: 12345
-  runAsGroup: 12345
-  fsGroup: 12345
-
 # Container-level security context settings (e.g., capabilities, privilege escalation)
 securityContext: {}
 
