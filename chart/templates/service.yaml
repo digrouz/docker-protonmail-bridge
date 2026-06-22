@@ -1,17 +1,19 @@
-apiVersion: v1
+---
 kind: Service
+apiVersion: v1
 metadata:
-  name: {{ include "protonmail-bridge.fullname" . }}
+  name: {{ include "protonmail-bridge.fullname" . }}-svc
+  namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "protonmail-bridge.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: protonmail-bridge
 spec:
   type: {{ .Values.service.type }}
   ports:
-    {{- range $portName, $port := .Values.service.ports }}
-    - name: {{ $portName }}
-      port: {{ $port }}
-      targetPort: {{ $port }}
-      protocol: TCP
-    {{- end }}
+  - port: {{ .Values.service.ports.imap }}
+    name: imap
+    protocol: TCP
+  - port: {{ .Values.service.ports.smtp }}
+    name: smtp
+    protocol: TCP
   selector:
-    {{- include "protonmail-bridge.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: protonmail-bridge

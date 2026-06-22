@@ -1,79 +1,82 @@
-# Number of replicas for the ProtonMail Bridge deployment
-replicaCount: 1
-
-# Container image configuration
+## @section Kubernetes settings
+##
 image:
-  # Repository of the ProtonMail Bridge image
+  ## @param image.registry protonmail-bridge image registry
+  ##
+  registry: docker.io
+  ## @param image.repository protonmail-bridge image repository
+  ##
   repository: digrouz/protonmail-bridge
-  # Image pull policy (Always, IfNotPresent, Never)
-  pullPolicy: IfNotPresent
-  # Image tag (defaults to Chart.AppVersion if not specified)
+  ## @param image.tag protonmail-bridge image tag
+  ## Ref: https://hub.docker.com/r/digrouz/protonmail-bridge/tags
+  ##
   tag: "latest"
-
-# Service configuration for accessing the bridge via IMAP and SMTP
+  ## @param image.pullPolicy protonmail-bridge image pull policy
+  ## ref: https://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+  ##
+  pullPolicy: Always
+## @param nameOverride String to override the release name.
+##
+nameOverride: ""
+## @param fullnameOverride String to override the application name.
+##
+fullnameOverride: ""
+## @section Service Configuration
+##
 service:
-  # Type of Kubernetes service (ClusterIP, NodePort, LoadBalancer)
-  type: ClusterIP
-  # Port mappings for the application services
-  ports:
-    imap: 143
-    smtp: 25
-
-# Environment variables as described in the project README.md
-env:
-  # User ID to run the application with
+  ## @param service.uid user id running protonmail-bridge
+  ##
   uid: 12345
-  # Group ID to run the application with
+  ## @param service.gid group id running protonmail-bridge
+  ##
   gid: 12345
-  # Whether to enable software auto-upgrade at startup (0 = disabled, 1 = enabled)
-  autoupgrade: "0"
-  # Timezone for the containerized application
-  timezone: "Europe/Brussels"
-
-# Container-level security context settings (e.g., capabilities, privilege escalation)
-securityContext: {}
-
-# List of image pull secrets for private registries
-imagePullSecrets: []
-
-# Custom labels to be added to the Pod metadata
-podLabels: {}
-
-# Resource management for the container
-resources:
-  # Maximum resources allowed for the container
-  limits:
-    cpu: 500m
-    memory: 512Mi
-  # Minimum resources guaranteed for the container
-  requests:
-    cpu: 100m
-    memory: 128Mi
-
-# Persistent storage configuration
+  ## @param service.autoupgrade apply OS updates inside container at startup
+  ##
+  autoupgrade: 0
+  ## @param service.tz Time Zone
+  ##
+  tz: Europe/Brussels
+  ## @param service.type Kubernetes service type
+  ##
+  type: ClusterIP
+  ports:
+    ## @param service.ports.imap IMAP port
+    ##
+    imap: 143
+    ## @param service.ports.smtp SMTP port
+    ##
+    smtp: 25
+## @section Storage persistence Configuration
+##
 persistence:
-  # Whether to enable persistent volume mounting
-  enabled: false
-  # Name of an existing PersistentVolumeClaim to use (if enabled)
-  existingClaim: ""
-  # Size of the requested volume if a new PVC is created
-  size: 1Gi
-  # Path inside the container where the volume is mounted
-  mountPath: /home/appuser/.config/protonmail-bridge # Adjust based on actual app usage
-
-# Kubernetes scheduling constraints
-# Node selector for targeting specific nodes
-nodeSelector: {}
-# Tolerations to allow pods to be scheduled on tainted nodes
-tolerations: []
-# Affinity rules to control pod placement relative to other pods or nodes
-affinity: {}
-
-# Gateway API configuration (Experimental/Advanced)
+  config:
+    ## @param persistence.config.enabled Enable persistence for protonmail-bridge config
+    ## If enabled, the config will be stored in a persistent volume
+    ## If disabled, the config will be stored in a temporary volume
+    enabled: true
+    ## @param persistence.config.storageClass Storage class for protonmail-bridge config
+    ## If not set, the default storage class will be used
+    storageClass: default
+    ## @param persistence.config.existingClaim Existing persistent volume claim for protonmail-bridge config
+    ## If set, the config will be stored in the existing persistent volume claim
+    existingClaim: ""
+    ## @param persistence.config.accessMode Access mode for protonmail-bridge config
+    ## If not set, the default access mode will be used
+    accessMode: ReadWriteOnce
+    ## @param persistence.config.size Size of the persistent volume for protonmail-bridge config
+    ## If not set, the default size will be used
+    size: 1024Mi
+    ## @param persistence.config.mountPath Mount path for protonmail-bridge config
+    ##
+    mountPath: /home/appuser/.config/protonmail-bridge
+## @section Gateway API Configuration
+##
 gatewayApi:
-  # Whether to enable TCPRoute resources for the Gateway API
+  ## @param gatewayApi.enabled Enable Gateway API TCPRoute resources
+  ##
   enabled: false
-  # Configuration for TCP routes to expose IMAP and SMTP ports via a Gateway
+  ## @param gatewayApi.tcpRoutes List of TCPRoutes to create
+  ##
   tcpRoutes:
     - name: imap
       port: 143

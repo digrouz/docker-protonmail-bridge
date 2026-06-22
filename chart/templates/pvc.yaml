@@ -1,0 +1,17 @@
+---
+{{- if and .Values.persistence.config.enabled (not .Values.persistence.config.existingClaim) }}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ include "protonmail-bridge.fullname" . }}-config-pvc
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/component: protonmail-bridge
+spec:
+  storageClassName: {{ .Values.persistence.config.storageClass }}
+  accessModes:
+    - {{ .Values.persistence.config.accessMode | quote }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.config.size | quote }}
+{{- end }}

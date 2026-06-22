@@ -1,39 +1,52 @@
-{{/* Expand the name of the chart. */}}
+{{/*
+Expand the name of the chart.
+*/}}
 {{- define "protonmail-bridge.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
-{{/* Create a default fully qualified app name. */}}
+
+{{/*
+Create a default fully qualified app name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+If release name contains chart name it will be used as a full name.
+*/}}
 {{- define "protonmail-bridge.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
-{{- $name := .Chart.Name }}
-{{- if contains "." .Chart.Name }}
-{{- $name = replace "." "-" .Chart.Name }}
+{{- $name := default .Chart.Name .Values.nameOverride }}
+{{- if contains $name .Release.Name }}
+{{- .Release.Name | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
 {{- end }}
-{{- $suffix := (print "-" .Chart.Name) }}
-{{- $baseName := trimSuffix $suffix $name }}
-{{- printf "%s%s" $baseName $suffix | trunc 63 | trimSuffix "-" }}
 {{- end }}
 {{- end }}
 
-{{/* Create chart name and version as suffix for chart annotations. */}}
+{{/*
+Create chart name and version as used by the chart label.
+*/}}
 {{- define "protonmail-bridge.chart" -}}
-{{- printf "%s-%s" .Chart.Name .Chart.Version | trunc 63 | trimSuffix "-" }}
+{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
-{{/* Selector labels are used as event selectors. */}}
-{{- define "protonmail-bridge.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "protonmail-bridge.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
-{{- end }}
-
-{{/* Pod labels are added to all Pod objects. */}}
-{{- define "protonmail-bridge.podLabels" -}}
-{{- include "protonmail-bridge.selectorLabels" . }}
+{{/*
+Common labels
+*/}}
+{{- define "protonmail-bridge.labels" -}}
+helm.sh/chart: {{ include "protonmail-bridge.chart" . }}
+{{ include "protonmail-bridge.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
-helm.sh/chart: {{ include "protonmail-bridge.chart" . }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end }}
+
+{{/*
+Selector labels
+*/}}
+{{- define "protonmail-bridge.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "protonmail-bridge.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}

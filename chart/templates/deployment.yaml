@@ -1,74 +1,49 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "protonmail-bridge.fullname" . }}
+  namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "protonmail-bridge.selectorLabels" . | nindent 4 }}
-    {{- if .Values.podLabels }}
-    {{- toYaml .Values.podLabels | nindent 4 }}
-    {{- end }}
+    app.kubernetes.io/component: protonmail-bridge
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: 1
   selector:
     matchLabels:
-      {{- include "protonmail-bridge.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: protonmail-bridge
   template:
     metadata:
       labels:
-        {{- include "protonmail-bridge.podLabels" . | nindent 8 }}
-        {{- if .Values.podLabels }}
-        {{- toYaml .Values.podLabels | nindent 8 }}
-        {{- end }}
+        app.kubernetes.io/component: protonmail-bridge
     spec:
-      {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       containers:
-        - name: {{ .Chart.Name }}
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        - name: protonmail-bridge
+          image: {{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          env:
-            - name: UID
-              value: {{ .Values.env.uid | quote }}
-            - name: GID
-              value: {{ .Values.env.gid | quote }}
-            - name: AUTOUPGRADE
-              value: {{ .Values.env.autoupgrade | quote }}
-            - name: TZ
-              value: {{ .Values.env.timezone | quote }}
           ports:
-            - name: imap
-              containerPort: {{ .Values.service.ports.imap }}
+            - containerPort: {{ .Values.service.ports.imap }}
+              name: imap
               protocol: TCP
-            - name: smtp
-              containerPort: {{ .Values.service.ports.smtp }}
+            - containerPort: {{ .Values.service.ports.smtp }}
+              name: smtp
               protocol: TCP
-          {{- with .Values.resources }}
-          resources:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          {{- if .Values.persistence.enabled }}
           volumeMounts:
-            - name: protonmail-bridge-data
-              mountPath: {{ .Values.persistence.mountPath }}
-          {{- end }}
-      {{- if .Values.persistence.enabled }}
+            - mountPath: {{ .Values.persistence.config.mountPath }}
+              name: protonmail-bridge-config
+          env:
+            - name: GID
+              value: "{{ .Values.service.gid }}"
+            - name: UID
+              value: "{{ .Values.service.uid }}"
+            - name: TZ
+              value: "{{ .Values.service.tz }}"
+            - name: AUTOUPGRADE
+              value: "{{ .Values.service.autoupgrade }}"
       volumes:
-        - name: protonmail-bridge-data
-          {{- if .Values.persistence.existingClaim }}
+        - name: protonmail-bridge-config
+          {{- if .Values.persistence.config.enabled }}
           persistentVolumeClaim:
-            claimName: {{ .Values.persistence.existingClaim }}
+            claimName: {{ if .Values.persistence.config.existingClaim }}{{ .Values.persistence.config.existingClaim }}{{- else }}{{ include "protonmail-bridge.fullname" . }}-config-pvc{{- end }}
           {{- else }}
-          persistentVolumeClaim:
-            claimName: {{ include "protonmail-bridge.fullname" . }}-data
+          emptyDir: { }
           {{- end }}
-      {{- end }}
-      nodeSelector:
-        {{- toYaml .Values.nodeSelector | nindent 8 }}
-      tolerations:
-        {{- toYaml .Values.tolerations | nindent 8 }}
-      affinity:
-        {{- toYaml .Values.affinity | nindent 8 }}
