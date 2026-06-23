@@ -4,6 +4,6 @@ To access the bridge services within the cluster, use the following service endp
   IMAP: {{ include "protonmail-bridge.fullname" . }}-svc:{{ .Values.service.ports.imap }}
   SMTP: {{ include "protonmail-bridge.fullname" . }}-svc:{{ .Values.service.ports.smtp }}
 
-{{- if .Values.gatewayApi.enabled }}
-Gateway API TCPRoutes have been created. Ensure your parentRefs match your configured Gateway.
+{{- if .Values.ingress.enabled }}
+Ingress is enabled. Ensure your Traefik entrypoints are configured correctly for IMAP and SMTP.
 {{- end }}

@@ -69,22 +69,36 @@ persistence:
     ## @param persistence.config.mountPath Mount path for protonmail-bridge config
     ##
     mountPath: /home/appuser/.config/protonmail-bridge
-## @section Gateway API Configuration
+## @section Ingress Configuration
 ##
-gatewayApi:
-  ## @param gatewayApi.enabled Enable Gateway API TCPRoute resources
+ingress:
+  ## @param ingress.enabled Enable ingress for the application.
   ##
   enabled: false
-  ## @param gatewayApi.tcpRoutes List of TCPRoutes to create
+  ## @param ingress.ingressClassName Ingress class name for the application.
   ##
-  tcpRoutes:
-    - name: imap
-      port: 143
-      parentRefs:
-        - name: my-gateway
-          namespace: default
-    - name: smtp
-      port: 25
-      parentRefs:
-        - name: my-gateway
-          namespace: default
+  ingressClassName: traefik
+  ## @param ingress.annotations Annotations for the application ingress.
+  ##
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: []
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  ## @param ingress.tls Enable TLS for the application ingress.
+  ##
+  tls: true
+  imap:
+    ## @param ingress.imap.priority priority for protonmail-bridge imap ingressRouteTCP
+    ##
+    priority: ""
+    ## @param ingress.imap.traefik.entrypoint Traefik entrypoint for protonmail-bridge imap ingress
+    ## Ref: https://doc.traefik.io/traefik/routing/entrypoints/
+    traefik:
+      entrypoint: ""
+  smtp:
+    ## @param ingress.smtp.priority priority for protonmail-bridge smtp ingressRouteTCP
+    ##
+    priority: ""
+    ## @param ingress.smtp.traefik.entrypoint Traefik entrypoint for protonmail-bridge smtp ingress
+    ## Ref: https://doc.traefik.io/traefik/routing/entrypoints/
+    traefik:
+      entrypoint: ""

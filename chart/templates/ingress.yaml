@@ -1,0 +1,36 @@
+{{- if .Values.ingress.enabled -}}
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: {{ include "protonmail-bridge.fullname" . }}-imap
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    kubernetes.io/ingress.class: {{ .Values.ingress.ingressClassName }}
+spec:
+  entryPoints:
+    - {{ .Values.ingress.imap.traefik.entrypoint }}
+  routes:
+  - match: HostSNI(`*`)
+    priority: {{ .Values.ingress.imap.priority }}
+    services:
+    - name: {{ include "protonmail-bridge.fullname" . }}-svc
+      port: {{ .Values.service.ports.imap }}
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: {{ include "protonmail-bridge.fullname" . }}-smtp
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    kubernetes.io/ingress.class: {{ .Values.ingress.ingressClassName }}
+spec:
+  entryPoints:
+    - {{ .Values.ingress.smtp.traefik.entrypoint }}
+  routes:
+  - match: HostSNI(`*`)
+    priority: {{ .Values.ingress.smtp.priority }}
+    services:
+    - name: {{ include "protonmail-bridge.fullname" . }}-svc
+      port: {{ .Values.service.ports.smtp }}
+{{- end }}
