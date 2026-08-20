@@ -1,5 +1,5 @@
 ARG BRIDGE_VERSION='3.25.0'
-ARG GOLANG_VERSION='1.26.6'
+ARG GOLANG_VERSION='1.27.0'
 ARG GOLANG_ARCH='amd64'
 
 FROM digrouz/debian-s6:latest AS builder
