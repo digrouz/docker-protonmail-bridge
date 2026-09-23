@@ -68,7 +68,7 @@ persistence:
     size: 1024Mi
     ## @param persistence.config.mountPath Mount path for protonmail-bridge config
     ##
-    mountPath: /home/appuser/.config/protonmail-bridge
+    mountPath: /home/appuser
 ## @section Ingress Configuration
 ##
 ingress:

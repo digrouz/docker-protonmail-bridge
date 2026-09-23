@@ -2,10 +2,15 @@
 
 cd /opt/protonmail
 
-echo "Generate gpg key"
-su-exec appuser gpg --generate-key --batch /opt/protonmail/etc/gpg-parameters
-echo "Init password manager"
-su-exec appuser pass init proton-key
+if ! su-exec appuser gpg --list-secret-keys proton-key 2>/dev/null; then
+    echo "Generate gpg key"
+    su-exec appuser gpg --generate-key --batch /opt/protonmail/etc/gpg-parameters
+fi
+
+if [ ! -d /home/appuser/.password-store ]; then
+    echo "Init password manager"
+    su-exec appuser pass init proton-key
+fi
   
 echo "Init Bridge"
 exec su-exec appuser /opt/protonmail/bin/proton-bridge --cli init
