@@ -85,7 +85,7 @@ RUN set -x && \
       pass \
       socat \
     && \
-    chmod 755 /opt/protonmail/bin/{bridge,protin-bridge,vault-editor} && \
+    chmod 755 /opt/protonmail/bin/{bridge,proton-bridge,vault-editor} && \
     chown -R appuser:appuser /opt/protonmail && \
     apt-get -y autoclean && \
     apt-get -y clean && \
