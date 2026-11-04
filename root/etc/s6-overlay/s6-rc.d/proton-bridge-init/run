@@ -2,14 +2,6 @@
 
 cd /opt/protonmail
 
-# Ensure the home/config dir is owned by appuser. A fresh PVC/emptyDir is created
-# root-owned, so the gpg/pass/bridge init below (run as appuser) would fail with
-# "permission denied". chown only when needed (idempotent).
-if [ "$(stat -c '%u' /home/appuser 2>/dev/null || echo 0)" != "$(id -u appuser)" ]; then
-    echo "Fix ownership of /home/appuser"
-    chown -R appuser:appuser /home/appuser
-fi
-
 if ! su-exec appuser gpg --list-secret-keys proton-key 2>/dev/null; then
     echo "Generate gpg key"
     su-exec appuser gpg --generate-key --batch /opt/protonmail/etc/gpg-parameters

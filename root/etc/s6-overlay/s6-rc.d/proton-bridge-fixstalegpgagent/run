@@ -1,0 +1,7 @@
+#!/command/with-contenv sh
+
+# Workaround for stale gpg-agent socket causing auth failures on restart
+# Cleans up leftover sockets in the GPG home directory
+if [ -d /home/appuser/.gnupg ]; then
+    rm -f /home/appuser/.gnupg/S.gpg-agent*
+fi

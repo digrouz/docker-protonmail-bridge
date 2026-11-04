@@ -1,0 +1,28 @@
+#!/command/with-contenv sh
+
+# The launcher execs any newer bridge it finds here (downloaded by the
+# built-in updater, amd64 only) instead of the image's binaries. Drop it so
+# the image version always runs, on every architecture.
+rm -rf "/home/appuser/.local/share/protonmail/bridge-v3/updates"
+
+# Persist AutoUpdate=false in the vault so the updater stops downloading.
+#
+# This used to be typed into the faketty FIFO of the long-running --cli
+# session. That session is gone (see below), so it is done here instead, in
+# a short-lived --cli run fed on stdin: the CLI quits on EOF -- the very
+# behaviour faketty existed to prevent -- so the pipe closing ends it.
+#
+# Guarded by a marker so it costs one extra bridge startup once in the life
+# of the volume, not one per boot. `if` also shields the pipeline from
+# `set -e`: failing to persist a preference must not stop the container from
+# starting, and an unwritten marker simply retries on the next boot.
+#
+# The password store is a precondition, not a nicety. Started on a volume
+# that has never seen `init`, the bridge finds no keychain, opens no vault
+# and has nowhere to write the setting -- yet the marker would be dropped
+# all the same, so the later `init` would never get its AutoUpdate=false.
+if [ ! -f "/home/appuser/.autoupdate-disabled" ] && [ -d "/home/appuser/.password-store" ]; then
+  if printf 'updates autoupdates disable\nyes\n' | /opt/protonmail/bin/proton-bridge --cli; then
+    touch "/home/appuser/.autoupdate-disabled"
+  fi
+fi
