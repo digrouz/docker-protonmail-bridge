@@ -1,11 +1,14 @@
 #!/command/with-contenv sh
 
-if [ -e /opt/protonmail/etc/protontty ];then
+# Create a regular file to use as proton-bridge's stdin. Older image versions
+# made this a FIFO; drop any stale one first so the `< protontty` redirection in
+# the run script cannot block forever waiting for a writer that never comes.
+if [ -e /opt/protonmail/etc/protontty ]; then
   echo "Cleanup TTY /opt/protonmail/etc/protontty"
-  rm -rf /opt/protonmail/etc/protontty
+  rm -f /opt/protonmail/etc/protontty
 fi
 
-echo "Creating TTY /opt/protonmail/etc/protontty"
-mkfifo /opt/protonmail/etc/protontty
-chown appuser /opt/protonmail/etc/protontty
+echo "Creating TTY file /opt/protonmail/etc/protontty"
+: > /opt/protonmail/etc/protontty
+chown appuser:appuser /opt/protonmail/etc/protontty
   

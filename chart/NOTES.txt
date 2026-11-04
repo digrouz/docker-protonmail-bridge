@@ -7,3 +7,60 @@ To access the bridge services within the cluster, use the following service endp
 {{- if .Values.ingress.enabled }}
 Ingress is enabled. Ensure your Traefik entrypoints are configured correctly for IMAP and SMTP.
 {{- end }}
+
+--------------------------------------------------------------------------------
+INITIALIZE YOUR PROTON ACCOUNT  (one-time, required)
+--------------------------------------------------------------------------------
+
+Bridge runs in non-interactive mode, so it will not ask for your Proton Mail
+password at start-up. You must add your Proton Mail account once, interactively,
+before the bridge will sync anything. The setup is stored under /home/appuser
+(the config PersistentVolumeClaim), so it must live on a persistent volume or
+you will have to repeat this after every pod recreation.
+
+What happens automatically on first start
+  A one-shot service (proton-bridge-init) runs before the bridge and,
+  idempotently on every start, it:
+    1. Ensures /home/appuser (the Bridge config directory) is owned by appuser.
+    2. Generates an unencrypted GPG key (proton-key).
+    3. Initializes the pass password store with that key
+       (/home/appuser/.password-store).
+    4. Runs proton-bridge --cli init to create the Bridge config/vault.
+
+  Because an unencrypted GPG key and a pass store exist, Bridge (which supports
+  pass as a Linux keychain) stores your account password GPG-encrypted inside
+  /home/appuser/.password-store. Since the key has no passphrase, the
+  non-interactive service can unlock it automatically on every start.
+
+Adding your account (one-time, interactive)
+  This needs a TTY, so stop the non-interactive service first, run the
+  interactive CLI, then start the service again:
+
+    # 0. Resolve the pod name
+    POD=$(kubectl get pod -n {{ .Release.Namespace }} -l app.kubernetes.io/component=protonmail-bridge -o name | cut -d/ -f2 | head -n1)
+
+    # 1. Stop the bridge so it is not holding the config/vault
+    kubectl exec -n {{ .Release.Namespace }} "$POD" -- s6-svc -d /var/run/s6/services/proton-bridge
+
+    # 2. Run the interactive CLI and follow the prompts
+    #    (add account -> Proton Mail address, password and 2FA code)
+    kubectl exec -it -n {{ .Release.Namespace }} "$POD" -- su-exec appuser /opt/protonmail/bin/proton-bridge --cli
+
+    # 3. Start the bridge again
+    kubectl exec -n {{ .Release.Namespace }} "$POD" -- s6-svc -u /var/run/s6/services/proton-bridge
+
+  Tip: you can also bring the bridge back up with
+    kubectl rollout restart -n {{ .Release.Namespace }} deployment/{{ include "protonmail-bridge.fullname" . }}
+
+Verify
+    kubectl logs -n {{ .Release.Namespace }} -l app.kubernetes.io/component=protonmail-bridge -f
+
+  You should see Bridge connect and start syncing. Your mail client can then use
+  the IMAP/SMTP endpoints listed above.
+
+Changing the password / starting over
+  * To change the stored password, repeat the interactive step above and edit the account.
+  * To start completely fresh, delete the config PersistentVolumeClaim
+    ({{ include "protonmail-bridge.fullname" . }}-config-pvc, unless
+    persistence.config.existingClaim is set) and the deployment; the automatic
+    init will run again on next start.

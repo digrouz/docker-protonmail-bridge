@@ -2,4 +2,7 @@
 
 cd /opt/protonmail
 
-exec cat /opt/protonmail/etc/protontty | su-exec appuser /opt/protonmail/bin/proton-bridge --noninteractive
+# exec straight into the bridge (no `cat` pipeline) so s6-supervise tracks
+# proton-bridge itself; stdin comes from the regular file created by the
+# proton-bridge-tty oneshot. This makes `s6-svc -d/-u` stop/restart cleanly.
+exec su-exec appuser /opt/protonmail/bin/proton-bridge --noninteractive < /opt/protonmail/etc/protontty
