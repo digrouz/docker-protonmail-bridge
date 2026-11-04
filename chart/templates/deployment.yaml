@@ -16,26 +16,6 @@ spec:
       labels:
         app.kubernetes.io/component: protonmail-bridge
     spec:
-      initContainers:
-        - name: fix-home-permissions
-          image: {{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          securityContext:
-            runAsUser: 0
-          command:
-            - /bin/sh
-            - -c
-            - |
-              set -e
-              # Fresh PVCs/emptyDirs are created root-owned; the bridge (appuser)
-              # cannot create its state dirs (.gnupg, .password-store, protonmail)
-              # unless it owns the mount point. chown only when needed (idempotent).
-              if [ "$(stat -c '%u' /home/appuser 2>/dev/null || echo 0)" != "{{ .Values.service.uid }}" ]; then
-                chown -R {{ .Values.service.uid }}:{{ .Values.service.gid }} /home/appuser
-              fi
-          volumeMounts:
-            - name: protonmail-bridge-config
-              mountPath: {{ .Values.persistence.config.mountPath }}
       containers:
         - name: protonmail-bridge
           image: {{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}
