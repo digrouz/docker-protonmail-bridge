@@ -127,6 +127,25 @@ service first, run the interactive CLI, then start the service again:
 You should see Bridge connect and start syncing. Your mail client can then use the
 container's IP on **143** (IMAP) and **25** (SMTP).
 
+#### Viewing the IMAP/SMTP credentials in the logs
+
+On every start, a one-shot service (`proton-bridge-credentials`) runs after the
+bridge is initialized and prints the IMAP/SMTP credentials for each configured
+Proton account to the container logs, in a clearly labelled block:
+
+    docker logs protonmail-bridge
+
+The block shows, per account, the **username** (your Proton address) and the
+**Bridge password** — the password your mail client authenticates with (it is
+*not* your Proton login password, and it also works with your other Proton
+addresses). It is only populated once you have added an account; on a fresh
+volume the service instead prints a reminder to initialize your account first.
+
+> **Note:** this intentionally writes your Bridge password to the container logs
+> so you can configure a mail client without running anything interactively. If
+> that is a concern for your environment, do not rely on the logs and retrieve
+> the credentials another way (e.g. the interactive `info` command).
+
 #### Changing the password / starting over
 
 * To change the stored password, just repeat the interactive step above and edit

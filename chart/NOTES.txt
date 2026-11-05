@@ -58,6 +58,11 @@ Verify
   You should see Bridge connect and start syncing. Your mail client can then use
   the IMAP/SMTP endpoints listed above.
 
+  The pod logs also print, on every start, the IMAP/SMTP credentials (username
+  and Bridge password) for each configured account in a labelled block -- use
+  those to configure your mail client. On a fresh volume it instead reminds you
+  to add your account first.
+
 Changing the password / starting over
   * To change the stored password, repeat the interactive step above and edit the account.
   * To start completely fresh, delete the config PersistentVolumeClaim

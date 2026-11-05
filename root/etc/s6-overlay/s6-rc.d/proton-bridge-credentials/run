@@ -1,0 +1,89 @@
+#!/command/with-contenv sh
+
+# Display the IMAP/SMTP credentials for every configured Proton account so
+# they can be read straight from the container logs (`docker logs`).
+#
+# Where the credentials live
+# --------------------------
+# Bridge never stores your Proton *account* password in a usable form. Instead
+# it keeps, per account, a generated "bridge password" that the mail client
+# authenticates with. That password is kept in the encrypted vault, which is
+# itself unlocked with a key held in the `pass` store (GPG-encrypted with the
+# unencrypted proton-key). The `vault-editor` binary (already in the image)
+# decrypts the vault and dumps it as JSON on stdout, including each user's
+# `BridgePass`.
+#
+# Encoding
+# --------
+# In the vault JSON, `BridgePass` is the raw password bytes encoded as
+# *standard* base64 (alphabet +/, with padding). The mail client, however, must
+# send the *same* bytes encoded as *URL-safe, unpadded* base64 (alphabet -_, no
+# padding) -- that is what Bridge's IMAP/SMTP `CheckAuth` expects. Translating
+# one alphabet into the other and dropping the padding is therefore just:
+#     tr '+/' '-_' | tr -d '='
+#
+# This is a purely informational oneshot. It must never block container startup,
+# so it always exits 0.
+
+VAULT_EDITOR="/opt/protonmail/bin/vault-editor"
+
+echo "ProtonMail Bridge: reading stored IMAP/SMTP credentials..."
+
+# Dump the vault as JSON. Run as appuser so the GPG key / pass store are usable.
+vault_json="$(su-exec appuser "$VAULT_EDITOR" read 2>/dev/null)"
+
+# No vault / not readable yet -> nothing to show. Not an error.
+if [ -z "$vault_json" ]; then
+    echo "ProtonMail Bridge: no credentials available yet."
+    echo "  Add your Proton account first (see README: 'Initialize your Proton account')."
+    exit 0
+fi
+
+count="$(printf '%s' "$vault_json" | jq '.Users | length' 2>/dev/null)"
+
+if [ -z "$count" ] || [ "$count" -eq 0 ]; then
+    echo "ProtonMail Bridge: no Proton account configured yet."
+    echo "  Add your Proton account first (see README: 'Initialize your Proton account')."
+    exit 0
+fi
+
+host="$(hostname 2>/dev/null || cat /etc/hostname 2>/dev/null || echo localhost)"
+
+echo ""
+echo "===================================================================="
+echo " ProtonMail Bridge IMAP/SMTP credentials (for your mail client)"
+echo "===================================================================="
+echo " Host (this container): $host"
+echo " IMAP port: 143   SMTP port: 25"
+echo " Use your Proton address as the username. The password below is the"
+echo " Bridge password (not your Proton login password); it also works with"
+echo " your other Proton addresses."
+echo ""
+
+i=0
+while [ "$i" -lt "$count" ]; do
+    username="$(printf '%s' "$vault_json" | jq -r ".Users[$i].PrimaryEmail // .Users[$i].Username // \"unknown\"")"
+    b64std="$(printf '%s' "$vault_json" | jq -r ".Users[$i].BridgePass // \"\"")"
+
+    if [ -z "$b64std" ]; then
+        echo "Account:  $username"
+        echo "  (no bridge password stored for this account yet)"
+        echo ""
+        i=$((i + 1))
+        continue
+    fi
+
+    # Standard base64 (from the vault JSON) -> URL-safe, unpadded base64
+    # (the exact password the mail client must use).
+    password="$(printf '%s' "$b64std" | tr '+/' '-_' | tr -d '=')"
+
+    echo "Account:  $username"
+    echo "Username: $username"
+    echo "Password: $password"
+    echo ""
+
+    i=$((i + 1))
+done
+
+echo "===================================================================="
+exit 0
